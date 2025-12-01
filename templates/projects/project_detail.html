@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}{{ project.name }} - TaskFlow{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-folder-fill"></i> {{ project.name }}</h1>
+        <div>
+            <a href="{% url 'projects:invite' project.pk %}" class="btn btn-info"><i class="bi bi-person-plus"></i> Invitar</a>
+            <a href="{% url 'tasks:create' project.pk %}" class="btn btn-success"><i class="bi bi-plus"></i> Nueva Tarea</a>
+            {% if project.creator == user or user.is_admin %}
+                <a href="{% url 'projects:update' project.pk %}" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                <a href="{% url 'projects:archive' project.pk %}" class="btn btn-secondary"><i class="bi bi-archive"></i></a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5>Descripción</h5>
+                    <p>{{ project.description|default:"Sin descripción" }}</p>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-4"><strong>Estado:</strong> <span class="badge bg-{{ project.get_status_display|lower }}">{{ project.get_status_display }}</span></div>
+                        <div class="col-md-4"><strong>Creador:</strong> {{ project.creator.username }}</div>
+                        <div class="col-md-4"><strong>Miembros:</strong> {{ project.members.count }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header bg-primary text-white"><h5 class="mb-0">Tareas</h5></div>
+                <div class="card-body p-0">
+                    {% for task in tasks %}
+                        <a href="{% url 'tasks:detail' task.pk %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between">
+                                <div><h6>{{ task.title }}</h6><small>{{ task.description|truncatewords:10 }}</small></div>
+                                <div><span class="badge bg-{{ task.get_status_color }}">{{ task.get_status_display }}</span></div>
+                            </div>
+                        </a>
+                    {% empty %}
+                        <div class="text-center py-5 text-muted">No hay tareas</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white"><h6 class="mb-0">Progreso</h6></div>
+                <div class="card-body">
+                    <h2 class="text-center">{{ progress }}%</h2>
+                    <div class="progress" style="height: 20px;"><div class="progress-bar bg-success" style="width: {{ progress }}%"></div></div>
+                    <hr>
+                    <div><i class="bi bi-check-circle text-success"></i> Completadas: {{ tasks_by_status.done }}</div>
+                    <div><i class="bi bi-clock text-info"></i> En progreso: {{ tasks_by_status.in_progress }}</div>
+                    <div><i class="bi bi-list text-secondary"></i> Por hacer: {{ tasks_by_status.todo }}</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><h6 class="mb-0">Actividad Reciente</h6></div>
+                <div class="card-body p-0">
+                    {% for activity in recent_activity %}
+                        <div class="list-group-item"><small>{{ activity.description }}</small><br><small class="text-muted">{{ activity.created_at|timesince }}</small></div>
+                    {% empty %}
+                        <div class="text-center py-3 text-muted">Sin actividad</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

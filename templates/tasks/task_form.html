@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_edit %}Editar{% else %}Crear{% endif %} Tarea{% endblock %}
+{% block content %}
+<div class="container"><div class="row"><div class="col-lg-8 mx-auto"><div class="card"><div class="card-header bg-primary text-white"><h4 class="mb-0">{% if is_edit %}Editar{% else %}Nueva{% endif %} Tarea</h4></div>
+<div class="card-body"><form method="post">{% csrf_token %}
+<div class="mb-3"><label class="form-label">Título *</label>{{ form.title }}</div>
+<div class="mb-3"><label class="form-label">Descripción</label>{{ form.description }}</div>
+<div class="mb-3"><label class="form-label">Asignar a</label>{{ form.assigned_to }}</div>
+<div class="row"><div class="col-md-6 mb-3"><label class="form-label">Estado</label>{{ form.status }}</div>
+<div class="col-md-6 mb-3"><label class="form-label">Prioridad</label>{{ form.priority }}</div></div>
+<div class="mb-4"><label class="form-label">Fecha de vencimiento</label>{{ form.due_date }}</div>
+<div class="d-grid gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Guardar</button>
+<a href="{% url 'projects:detail' project.pk %}" class="btn btn-secondary">Cancelar</a></div>
+</form></div></div></div></div></div>
+{% endblock %}

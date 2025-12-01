@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid"><h1><i class="bi bi-archive"></i> Proyectos Archivados</h1>
+<div class="row g-4 mt-2">{% for project in projects %}
+<div class="col-md-4"><div class="card"><div class="card-body"><h5>{{ project.name }}</h5><p>{{ project.description|truncatewords:20 }}</p>
+<a href="{% url 'projects:detail' project.pk %}" class="btn btn-primary">Ver</a>
+<a href="{% url 'projects:archive' project.pk %}" class="btn btn-success">Desarchivar</a></div></div></div>
+{% empty %}<div class="col-12 text-center py-5"><h4>No hay proyectos archivados</h4></div>{% endfor %}</div></div>
+{% endblock %}

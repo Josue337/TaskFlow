@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}{{ task.title }}{% endblock %}
+{% block content %}
+<div class="container-fluid"><div class="row g-4"><div class="col-lg-8">
+<div class="card mb-4"><div class="card-body">
+<div class="d-flex justify-content-between mb-3">
+<h2>{{ task.title }}</h2>
+<div><span class="badge bg-{{ task.get_status_color }}">{{ task.get_status_display }}</span>
+<span class="badge bg-{{ task.get_priority_color }}">{{ task.get_priority_display }}</span></div></div>
+<p>{{ task.description|default:"Sin descripción" }}</p><hr>
+<form method="post" action="{% url 'tasks:change_status' task.pk %}">{% csrf_token %}
+<label>Cambiar estado:</label><select name="status" class="form-select d-inline w-auto" onchange="this.form.submit()">
+<option value="todo" {% if task.status == 'todo' %}selected{% endif %}>Por Hacer</option>
+<option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>En Progreso</option>
+<option value="done" {% if task.status == 'done' %}selected{% endif %}>Completado</option></select></form>
+</div></div>
+<div class="card mb-4"><div class="card-header"><h5>Comentarios</h5></div><div class="card-body">
+<form method="post">{% csrf_token %}{{ comment_form.content }}<button type="submit" name="add_comment" class="btn btn-primary mt-2">Comentar</button></form><hr>
+{% for comment in comments %}<div class="mb-3"><strong>{{ comment.author.username }}</strong> <small class="text-muted">{{ comment.created_at|timesince }}</small><p>{{ comment.content }}</p></div>{% endfor %}
+</div></div>
+<div class="card"><div class="card-header"><h5>Archivos Adjuntos</h5></div><div class="card-body">
+<form method="post" enctype="multipart/form-data">{% csrf_token %}{{ attachment_form.file }}{{ attachment_form.description }}<button type="submit" name="add_attachment" class="btn btn-success mt-2">Subir</button></form><hr>
+{% for att in attachments %}<div><i class="bi bi-file-earmark"></i> <a href="{{ att.file.url }}" target="_blank">{{ att.file.name }}</a></div>{% endfor %}
+</div></div></div>
+<div class="col-lg-4"><div class="card"><div class="card-body">
+<h5>Información</h5><hr><p><strong>Proyecto:</strong> <a href="{% url 'projects:detail' project.pk %}">{{ project.name }}</a></p>
+<p><strong>Creado por:</strong> {{ task.created_by.username }}</p><p><strong>Fecha:</strong> {{ task.created_at|date:"d/m/Y" }}</p>
+<p><strong>Vencimiento:</strong> {{ task.due_date|date:"d/m/Y"|default:"Sin fecha" }}</p><hr>
+<a href="{% url 'tasks:update' task.pk %}" class="btn btn-warning w-100 mb-2">Editar</a>
+<a href="{% url 'tasks:delete' task.pk %}" class="btn btn-danger w-100">Eliminar</a>
+</div></div></div></div></div>
+{% endblock %}

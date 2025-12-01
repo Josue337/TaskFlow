@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container"><div class="row"><div class="col-lg-6 mx-auto"><div class="card">
+<div class="card-header bg-info text-white"><h4>Invitar Miembros - {{ project.name }}</h4></div>
+<div class="card-body"><form method="post">{% csrf_token %}<div class="mb-3"><label>Email</label>{{ form.email }}</div>
+<button type="submit" class="btn btn-primary w-100">Enviar Invitación</button></form><hr>
+<h5>Invitaciones Pendientes</h5>{% for inv in invitations %}<div>{{ inv.email }} - {{ inv.status }}</div>{% endfor %}
+</div></div></div></div></div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid"><h1><i class="bi bi-graph-up"></i> Estadísticas</h1>
+<div class="row g-4 mt-2"><div class="col-md-6"><div class="card"><div class="card-header">Proyectos por Estado</div>
+<div class="card-body"><canvas id="projectsChart"></canvas></div></div></div>
+<div class="col-md-6"><div class="card"><div class="card-header">Mis Tareas</div>
+<div class="card-body"><canvas id="tasksChart"></canvas></div></div></div></div>
+<div class="row g-4 mt-3">{% for stat in project_stats %}
+<div class="col-md-4"><div class="card"><div class="card-body"><h5>{{ stat.project.name }}</h5>
+<div class="progress mb-2"><div class="progress-bar" style="width:{{ stat.progress }}%">{{ stat.progress }}%</div></div>
+<small>Tareas: {{ stat.total_tasks }} | Miembros: {{ stat.members_count }}</small></div></div></div>
+{% endfor %}</div></div>
+{% endblock %}
+{% block extra_js %}<script>
+const data={{ chart_data|safe }};
+new Chart(document.getElementById('projectsChart'),{type:'pie',data:{labels:data.projects_by_status.labels,datasets:[{data:data.projects_by_status.data,backgroundColor:['#198754','#0dcaf0','#ffc107','#6c757d']}]}});
+new Chart(document.getElementById('tasksChart'),{type:'doughnut',data:{labels:data.my_tasks_status.labels,datasets:[{data:data.my_tasks_status.data,backgroundColor:['#6c757d','#0d6efd','#198754']}]}});
+</script>{% endblock %}

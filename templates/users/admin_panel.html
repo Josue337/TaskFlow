@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid"><h1><i class="bi bi-shield-lock"></i> Panel de Administración</h1>
+<div class="row g-3 mb-4"><div class="col-md-4"><div class="card"><div class="card-body"><h5>Total Usuarios</h5><h2>{{ total_users }}</h2></div></div></div>
+<div class="col-md-4"><div class="card"><div class="card-body"><h5>Administradores</h5><h2>{{ admin_users }}</h2></div></div></div>
+<div class="col-md-4"><div class="card"><div class="card-body"><h5>Usuarios</h5><h2>{{ regular_users }}</h2></div></div></div></div>
+<div class="card"><div class="card-header"><h5>Usuarios del Sistema</h5></div>
+<div class="card-body"><table class="table"><thead><tr><th>Usuario</th><th>Email</th><th>Rol</th><th>Registro</th><th>Acciones</th></tr></thead>
+<tbody>{% for u in users %}<tr><td>{{ u.username }}</td><td>{{ u.email }}</td>
+<td><span class="badge bg-{% if u.role == 'admin' %}danger{% else %}primary{% endif %}">{{ u.get_role_display }}</span></td>
+<td>{{ u.created_at|date:"d/m/Y" }}</td><td><a href="{% url 'users:change_role' u.id %}" class="btn btn-sm btn-warning">Cambiar Rol</a></td></tr>{% endfor %}
+</tbody></table></div></div></div>
+{% endblock %}

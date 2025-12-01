@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TaskFlow{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Chart.js para gráficos (US19) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #06b6d4;
+            --dark-bg: #1e293b;
+            --dark-sidebar: #0f172a;
+            --dark-card: #334155;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        /* US16: Modo oscuro */
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .card {
+            background-color: var(--dark-card);
+            border-color: #475569;
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .navbar,
+        body.dark-mode .sidebar {
+            background-color: var(--dark-sidebar) !important;
+        }
+        
+        body.dark-mode .list-group-item {
+            background-color: var(--dark-card);
+            border-color: #475569;
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .table {
+            color: #e2e8f0;
+        }
+        
+        /* US17: Navegación intuitiva - Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 260px;
+            background: linear-gradient(180deg, var(--primary-color) 0%, #3730a3 100%);
+            padding-top: 20px;
+            transition: all 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            margin: 5px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 260px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        /* Navbar superior */
+        .top-navbar {
+            margin-left: 260px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        body.dark-mode .top-navbar {
+            background-color: var(--dark-sidebar);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        /* Cards mejorados */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        /* Badges mejorados */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        /* Botón de modo oscuro (US16) */
+        .dark-mode-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s;
+        }
+        
+        .dark-mode-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Prioridades */
+        .priority-low { border-left: 4px solid #10b981; }
+        .priority-medium { border-left: 4px solid #3b82f6; }
+        .priority-high { border-left: 4px solid #f59e0b; }
+        .priority-urgent { border-left: 4px solid #ef4444; }
+        
+        /* Estados */
+        .status-todo { border-left: 4px solid #6b7280; }
+        .status-in_progress { border-left: 4px solid #3b82f6; }
+        .status-done { border-left: 4px solid #10b981; }
+        
+        /* Progress bars */
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+        }
+        
+        /* Avatar */
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .avatar-sm {
+            width: 30px;
+            height: 30px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content,
+            .top-navbar {
+                margin-left: 0;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <!-- US17: Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+        <div class="text-center mb-4">
+            <h3 class="text-white fw-bold">
+                <i class="bi bi-clipboard-check"></i> TaskFlow
+            </h3>
+        </div>
+        
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'dashboard:home' %}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'projects' in request.path %}active{% endif %}" href="{% url 'projects:list' %}">
+                    <i class="bi bi-folder"></i> Proyectos
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'statistics' %}active{% endif %}" href="{% url 'dashboard:statistics' %}">
+                    <i class="bi bi-graph-up"></i> Estadísticas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'projects:archived' %}">
+                    <i class="bi bi-archive"></i> Archivados
+                </a>
+            </li>
+            
+            <hr class="text-white-50 mx-3">
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'users:profile' %}">
+                    <i class="bi bi-person-circle"></i> Mi Perfil
+                </a>
+            </li>
+            
+            {% if user.is_admin %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'users:admin_panel' %}">
+                    <i class="bi bi-shield-lock"></i> Admin Panel
+                </a>
+            </li>
+            {% endif %}
+            
+            <li class="nav-item mt-3">
+                <a class="nav-link" href="{% url 'users:logout' %}">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </a>
+            </li>
+        </ul>
+        
+        <div class="text-center mt-4 text-white-50 small">
+            <p class="mb-0">{{ user.get_full_name_or_username }}</p>
+            <span class="badge bg-light text-dark">{{ user.get_role_display }}</span>
+        </div>
+    </nav>
+    
+    <!-- Top Navbar -->
+    <nav class="navbar top-navbar sticky-top">
+        <div class="container-fluid">
+            <button class="btn btn-link d-md-none" id="sidebarToggle">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+            <span class="navbar-text ms-auto">
+                {% if user.profile_picture %}
+                <img src="{{ user.profile_picture.url }}" alt="Avatar" class="avatar">
+                {% else %}
+                <i class="bi bi-person-circle fs-3"></i>
+                {% endif %}
+            </span>
+        </div>
+    </nav>
+    {% endif %}
+    
+    <!-- Main Content -->
+    <main class="{% if user.is_authenticated %}main-content{% else %}container mt-5{% endif %}">
+        <!-- Mensajes -->
+        {% if messages %}
+            <div class="container mb-4">
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- US16: Botón de modo oscuro -->
+    {% if user.is_authenticated %}
+    <button class="dark-mode-toggle" id="darkModeToggle" title="Cambiar tema">
+        <i class="bi bi-moon-stars" id="darkModeIcon"></i>
+    </button>
+    {% endif %}
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- US16: Script del modo oscuro -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Modo oscuro
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const darkModeIcon = document.getElementById('darkModeIcon');
+            const body = document.body;
+            
+            // Cargar preferencia guardada
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                body.classList.add('dark-mode');
+                if (darkModeIcon) darkModeIcon.className = 'bi bi-sun';
+            }
+            
+            if (darkModeToggle) {
+                darkModeToggle.addEventListener('click', function() {
+                    body.classList.toggle('dark-mode');
+                    
+                    if (body.classList.contains('dark-mode')) {
+                        localStorage.setItem('darkMode', 'enabled');
+                        darkModeIcon.className = 'bi bi-sun';
+                    } else {
+                        localStorage.setItem('darkMode', 'disabled');
+                        darkModeIcon.className = 'bi bi-moon-stars';
+                    }
+                });
+            }
+            
+            // Toggle sidebar en móvil
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('show');
+                });
+            }
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
